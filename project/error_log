@@ -1,0 +1,24 @@
+[15-Jun-2020 09:53:57 UTC] PHP Fatal error:  Declaration of App\Exceptions\Handler::report(Exception $exception) must be compatible with Illuminate\Foundation\Exceptions\Handler::report(Throwable $e) in /home/evenabbr/test.evendory.com/project/app/Exceptions/Handler.php on line 33
+[15-Jun-2020 09:53:57 UTC] PHP Fatal error:  Uncaught ReflectionException: Class App\Exceptions\Handler does not exist in /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Container/Container.php:805
+Stack trace:
+#0 /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Container/Container.php(805): ReflectionClass->__construct('App\\Exceptions\\...')
+#1 /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Container/Container.php(687): Illuminate\Container\Container->build('App\\Exceptions\\...')
+#2 /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(796): Illuminate\Container\Container->resolve('App\\Exceptions\\...', Array, false)
+#3 /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Container/Container.php(265): Illuminate\Foundation\Application->resolve('App\\Exceptions\\...', Array, false)
+#4 /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Containe in /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 807
+[15-Jun-2020 09:56:47 UTC] PHP Fatal error:  Declaration of App\Exceptions\Handler::report(Exception $exception) must be compatible with Illuminate\Foundation\Exceptions\Handler::report(Throwable $e) in /home/evenabbr/test.evendory.com/project/app/Exceptions/Handler.php on line 33
+[15-Jun-2020 09:56:47 UTC] PHP Fatal error:  Uncaught ReflectionException: Class App\Exceptions\Handler does not exist in /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Container/Container.php:805
+Stack trace:
+#0 /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Container/Container.php(805): ReflectionClass->__construct('App\\Exceptions\\...')
+#1 /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Container/Container.php(687): Illuminate\Container\Container->build('App\\Exceptions\\...')
+#2 /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(796): Illuminate\Container\Container->resolve('App\\Exceptions\\...', Array, false)
+#3 /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Container/Container.php(265): Illuminate\Foundation\Application->resolve('App\\Exceptions\\...', Array, false)
+#4 /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Containe in /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 807
+[15-Jun-2020 09:57:20 UTC] PHP Fatal error:  Declaration of App\Exceptions\Handler::report(Exception $exception) must be compatible with Illuminate\Foundation\Exceptions\Handler::report(Throwable $e) in /home/evenabbr/test.evendory.com/project/app/Exceptions/Handler.php on line 33
+[15-Jun-2020 09:57:20 UTC] PHP Fatal error:  Uncaught ReflectionException: Class App\Exceptions\Handler does not exist in /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Container/Container.php:805
+Stack trace:
+#0 /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Container/Container.php(805): ReflectionClass->__construct('App\\Exceptions\\...')
+#1 /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Container/Container.php(687): Illuminate\Container\Container->build('App\\Exceptions\\...')
+#2 /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(796): Illuminate\Container\Container->resolve('App\\Exceptions\\...', Array, false)
+#3 /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Container/Container.php(265): Illuminate\Foundation\Application->resolve('App\\Exceptions\\...', Array, false)
+#4 /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Containe in /home/evenabbr/test.evendory.com/project/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 807
