@@ -17,13 +17,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use InvalidArgumentException;
-use Markury\MarkuryPost;
+// use Markury\MarkuryPost;
 
 class FrontendController extends Controller
 {
     public function __construct()
     {
-        $this->auth_guests();
+        // $this->auth_guests();
         if(isset($_SERVER['HTTP_REFERER'])){
             $referral = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
             if ($referral != $_SERVER['SERVER_NAME']){
@@ -524,22 +524,22 @@ function finalize(){
     return redirect('/');
 }
 
-function auth_guests(){
-    $chk = MarkuryPost::marcuryBase();
-    $chkData = MarkuryPost::marcurryBase();
-    $actual_path = str_replace('project','',base_path());
-    if ($chk != MarkuryPost::maarcuryBase()) {
-        if ($chkData < MarkuryPost::marrcuryBase()) {
-            if (is_dir($actual_path . '/install')) {
-                header("Location: " . url('/install'));
-                die();
-            } else {
-                echo MarkuryPost::marcuryBasee();
-                die();
-            }
-        }
-    }
-}
+// function auth_guests(){
+//     $chk = MarkuryPost::marcuryBase();
+//     $chkData = MarkuryPost::marcurryBase();
+//     $actual_path = str_replace('project','',base_path());
+//     if ($chk != MarkuryPost::maarcuryBase()) {
+//         if ($chkData < MarkuryPost::marrcuryBase()) {
+//             if (is_dir($actual_path . '/install')) {
+//                 header("Location: " . url('/install'));
+//                 die();
+//             } else {
+//                 echo MarkuryPost::marcuryBasee();
+//                 die();
+//             }
+//         }
+//     }
+// }
 
 public function subscription(Request $request)
 {

@@ -19,10 +19,11 @@ use App\Models\User;
 use App\Models\UserNotification;
 use App\Models\VendorOrder;
 use Auth;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Session;
-use Validator;
+use App\Library\SslCommerz\SslCommerzNotification;
+use Illuminate\Support\Facades\Validator;
 
 class CheckoutController extends Controller
 {
@@ -142,7 +143,7 @@ class CheckoutController extends Controller
                 $total = $total - $coupon;
                 $total = $total + 0;
             } else {
-//                $total = Session::get('coupon_total');
+                // $total = Session::get('coupon_total');
                 //added later to exclude currency sign
                 $total = preg_replace('/[^0-9\.]/', '', Session::get('coupon_total'));
                 $total = $total + round(0 * $curr->value, 2);
@@ -597,13 +598,46 @@ class CheckoutController extends Controller
         return redirect($success_url);
     }
 
+    public function exampleEasyCheckout()
+    {
+        return view('exampleEasycheckout');
+    }
+    public function payModal(Request $request){
+        if (Session::has('currency')) {
+            $curr = Currency::find(Session::get('currency'));
+        } else {
+            $curr = Currency::where('is_default', '=', 1)->first();
+        }
+        $update_product = DB::table('orderstry')
+        ->where('transaction_id', $post_data['tran_id'])
+        ->updateOrInsert([
+            'name' => $request['name'],
+            'email' => $request['email'],
+            'phone' => $request['phone'],
+            'amount' => $request['grandtotal'],
+            'status' => 'pending',
+            'address' => $request['address'],
+            'transaction_id' => $request['tran_id'],
+            'currency' => $curr
+        ]);
+    $sslc = new SslCommerzNotification();
+    # initiate(Transaction Data , false: Redirect to SSLCOMMERZ gateway/ true: Show all the Payement gateway here )
+    $payment_options = $sslc->makePayment($request->all(), 'hosted');
+
+    if (!is_array($payment_options)) {
+        print_r($payment_options);
+        $payment_options = array();
+    }
+    }
+    
     public function gateway(Request $request)
     {
 
-        $input = $request->all();
-
+        $input = (array) json_decode($request->cart_json);
+        info($input);
+        $input['tran_id'] = uniqid();
         $rules = [
-            'txn_id4' => 'required',
+            'tran_id' => 'required',
         ];
 
 
@@ -618,17 +652,17 @@ class CheckoutController extends Controller
             return redirect()->back()->withInput();
         }
 
-        if ($request->pass_check) {
-            $users = User::where('email', '=', $request->personal_email)->get();
+        if (isset($input['pass_check']) && $input['pass_check'] == 1) {
+            $users = User::where('email', '=', $input['personal_email'])->get();
             if (count($users) == 0) {
-                if ($request->personal_pass == $request->personal_confirm) {
+                if ($input['personal_pass'] == $input['personal_confirm_pass']) {
                     $user = new User;
-                    $user->name = $request->personal_name;
-                    $user->email = $request->personal_email;
-                    $user->password = bcrypt($request->personal_pass);
-                    $token = md5(time() . $request->personal_name . $request->personal_email);
+                    $user->name = $input['personal_name'];
+                    $user->email = $input['personal_email'];
+                    $user->password = bcrypt($input['personal_pass']);
+                    $token = md5(time() .$input['personal_name'] . $input['personal_email']);
                     $user->verification_link = $token;
-                    $user->affilate_code = md5($request->name . $request->email);
+                    $user->affilate_code = md5($input['name'] . $input['email']);
                     $user->email_verified = 'Yes';
                     $user->save();
                     Auth::guard('web')->login($user);
@@ -678,43 +712,43 @@ class CheckoutController extends Controller
         $success_url = action('Front\PaymentController@payreturn');
         $item_name = $settings->title . " Order";
         $item_number = str_random(4) . time();
-        $order['user_id'] = $request->user_id;
-        $order['cart'] = utf8_encode(bzcompress(serialize($cart), 9));
-        $order['totalQty'] = $request->totalQty;
-        $order['pay_amount'] = round($request->total / $curr->value, 2);
-        $order['method'] = $request->method;
-        $order['shipping'] = $request->shipping;
-        $order['pickup_location'] = $request->pickup_location;
-        $order['customer_email'] = $request->email;
-        $order['customer_name'] = $request->name;
-        $order['shipping_cost'] = $request->shipping_cost;
-        $order['packing_cost'] = $request->packing_cost;
-        $order['tax'] = $request->tax;
-        $order['customer_phone'] = $request->phone;
+        $order['user_id'] = $input['user_id'];
+        // $order['cart'] = utf8_encode(bzcompress(serialize($cart), 9));
+        $order['totalQty'] = $input['totalQty'];
+        $order['pay_amount'] = round($input['total'] / $curr->value, 2);
+        $order['method'] = $input['method'];
+        $order['shipping'] = $input['shipping'];
+        $order['pickup_location'] = $input['pickup_location'];
+        $order['customer_email'] = $input['email'];
+        $order['customer_name'] = $input['name'];
+        $order['shipping_cost'] = $input['shipping_cost'];
+        $order['packing_cost'] = $input['packing_cost'];
+        $order['tax'] = $input['tax'];
+        $order['customer_phone'] = $input['phone'];
         $order['order_number'] = str_random(4) . time();
-        $order['customer_address'] = $request->address;
-        $order['customer_country'] = $request->customer_country;
-        $order['customer_city'] = $request->city;
-        $order['customer_zip'] = $request->zip;
-        $order['shipping_email'] = $request->shipping_email;
-        $order['shipping_name'] = $request->shipping_name;
-        $order['shipping_phone'] = $request->shipping_phone;
-        $order['shipping_address'] = $request->shipping_address;
-        $order['shipping_country'] = $request->shipping_country;
-        $order['shipping_city'] = $request->shipping_city;
-        $order['shipping_zip'] = $request->shipping_zip;
-        $order['order_note'] = $request->order_notes;
-        $order['txnid'] = $request->txn_id4;
-        $order['coupon_code'] = $request->coupon_code;
-        $order['coupon_discount'] = $request->coupon_discount;
-        $order['dp'] = $request->dp;
-        $order['payment_status'] = "Pending";
-        $order['currency_sign'] = $curr->sign;
-        $order['currency_value'] = $curr->value;
-        $order['vendor_shipping_id'] = $request->vendor_shipping_id;
-        $order['vendor_packing_id'] = $request->vendor_packing_id;
+        $order['customer_address'] = $input['address'];
+        $order['customer_country'] = $input['customer_country'];
+        $order['customer_city'] = $input['city'];
+        $order['customer_zip'] = $input['zip'];
+        $order['shipping_email'] = $input['shipping_email'];
+        $order['shipping_name'] = $input['shipping_name'];
+        $order['shipping_phone'] = $input['shipping_phone'];
+        $order['shipping_address'] = $input['shipping_address'];
+        $order['shipping_country'] = $input['shipping_country'];
+        $order['shipping_city'] = $input['shipping_city'];
+        $order['shipping_zip'] = $input['shipping_zip'];
+        $order['order_note'] = $input['order_notes'];
+        $order['txnid'] = $input['tran_id'];
+        $order['coupon_code'] = $input['coupon_code'];
+        $order['coupon_discount'] = $input['coupon_discount'];
+        $order['dp'] = $input['dp'];
+        $order['payment_status'] = "pending";
+        $order['currency_sign'] = $curr['sign'];
+        $order['currency_value'] = $curr['value'];
+        $order['vendor_shipping_id'] = $input['vendor_shipping_id'];
+        $order['vendor_packing_id'] = $input['vendor_packing_id'];
         if (Session::has('affilate')) {
-            $val = $request->total / $curr->value;
+            $val = $input['total'] / $curr->value;
             $val = $val / 100;
             $sub = $val * $gs->affilate_charge;
             $user = User::findOrFail(Session::get('affilate'));
@@ -734,8 +768,8 @@ class CheckoutController extends Controller
         $notification = new Notification;
         $notification->order_id = $order->id;
         $notification->save();
-        if ($request->coupon_id != "") {
-            $coupon = Coupon::findOrFail($request->coupon_id);
+        if ($input['coupon_id'] != "") {
+            $coupon = Coupon::findOrFail($input['coupon_id']);
             $coupon->used++;
             if ($coupon->times != null) {
                 $i = (int)$coupon->times;
@@ -815,9 +849,9 @@ class CheckoutController extends Controller
         //Sending Email To Buyer
         if ($gs->is_smtp == 1) {
             $data = [
-                'to' => $request->email,
+                'to' => $input['email'],
                 'type' => "new_order",
-                'cname' => $request->name,
+                'cname' => $input['name'],
                 'oamount' => "",
                 'aname' => "",
                 'aemail' => "",
@@ -828,9 +862,9 @@ class CheckoutController extends Controller
             $mailer = new GeniusMailer();
             $mailer->sendAutoOrderMail($data, $order->id);
         } else {
-            $to = $request->email;
+            $to = $input['email'];
             $subject = "Your Order Placed!!";
-            $msg = "Hello " . $request->name . "!\nYou have placed a new order.\nYour order number is " . $order->order_number . ".Please wait for your delivery. \nThank you.";
+            $msg = "Hello " . $input['name'] . "!\nYou have placed a new order.\nYour order number is " . $order->order_number . ".Please wait for your delivery. \nThank you.";
             $headers = "From: " . $gs->from_name . "<" . $gs->from_email . ">";
             mail($to, $subject, $msg, $headers);
         }
@@ -851,10 +885,71 @@ class CheckoutController extends Controller
             $headers = "From: " . $gs->from_name . "<" . $gs->from_email . ">";
             mail($to, $subject, $msg, $headers);
         }
+        $sslc = new SslCommerzNotification();
+        # initiate(Transaction Data , false: Redirect to SSLCOMMERZ gateway/ true: Show all the Payement gateway here )
+        $payment_options = $sslc->makePayment($input, 'checkout', 'json');
 
+        if (!is_array($payment_options)) {
+            print_r($payment_options);
+            $payment_options = array();
+        }
         return redirect($success_url);
     }
 
+    public function success(Request $request)
+    {
+        if (Session::has('currency')) {
+            $curr = Currency::find(Session::get('currency'));
+        } else {
+            $curr = Currency::where('is_default', '=', 1)->first();
+        }
+        echo "Transaction is Successful";
+dd('asd');
+        $tran_id = $request->input('tran_id');
+        $amount = $request->input('amount');
+        $currency = $curr;
+        $sslc = new SslCommerzNotification();
+
+        #Check order status in order tabel against the transaction id or order id.
+        $order_detials = DB::table('orders')
+            ->where('txnid', $tran_id)
+            ->select('txnid', 'status', 'pay_amount')->first();
+        if ($order_detials->status == 'pending') {
+            $validation = $sslc->orderValidate($request->all(), $tran_id, $amount, $currency);
+
+            if ($validation == TRUE) {
+                /*
+                That means IPN did not work or IPN URL was not set in your merchant panel. Here you need to update order status
+                in order table as Processing or Complete.
+                Here you can also sent sms or email for successfull transaction to customer
+                */
+                $update_product = DB::table('orders')
+                    ->where('txnid', $tran_id)
+                    ->update(['status' => 'processing']);
+
+                echo "<br >Transaction is successfully Completed";
+            } else {
+                /*
+                That means IPN did not work or IPN URL was not set in your merchant panel and Transation validation failed.
+                Here you need to update order status as Failed in order table.
+                */
+                $update_product = DB::table('orders')
+                    ->where('txnid', $tran_id)
+                    ->update(['status' => 'failed']);
+                echo "validation Fail";
+            }
+        } else if ($order_detials->status == 'processing' || $order_detials->status == 'completed') {
+            /*
+             That means through IPN Order status already updated. Now you can just show the customer that transaction is completed. No need to udate database.
+             */
+            echo "Transaction is successfully Completed";
+        } else {
+            #That means something wrong happened. You can redirect customer to your product page.
+            echo "Invalid Transaction";
+        }
+
+
+    }
 
     // Capcha Code Image
     private function code_image()

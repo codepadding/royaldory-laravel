@@ -142,7 +142,7 @@
                                                     </div>
 
                                                     <div class="col-lg-6 d-none" id="shipshow">
-                                                        <select class="form-control nice" name="pickup_location">
+                                                        <select class="form-control nice" name="pickup_location" id="pickup_location">
                                                             @foreach($pickups as $pickup)
                                                                 <option value="{{$pickup->location}}">{{$pickup->location}}</option>
                                                             @endforeach
@@ -150,38 +150,37 @@
                                                     </div>
 
                                                     <div class="col-lg-6">
-                                                        <input class="form-control" type="text" name="name"
+                                                        <input class="form-control" type="text" name="name" id="name"
                                                                placeholder="{{ $langg->lang152 }}" required=""
                                                                value="{{ Auth::guard('web')->check() ? Auth::guard('web')->user()->name : '' }}">
                                                     </div>
                                                     <div class="col-lg-6">
-                                                        <input class="form-control" type="text" name="phone"
-                                                               placeholder="{{ $langg->lang153 }}" required=""
+                                                        <input class="form-control" type="text" name="phone" id="phone" placeholder="{{ $langg->lang153 }}" required=""
                                                                value="{{ Auth::guard('web')->check() ? Auth::guard('web')->user()->phone : '' }}">
                                                     </div>
                                                     <div class="col-lg-6">
-                                                        <input class="form-control" type="text" name="email"
+                                                        <input class="form-control" type="text" name="email" id="email"
                                                                placeholder="{{ $langg->lang154 }}" required=""
                                                                value="{{ Auth::guard('web')->check() ? Auth::guard('web')->user()->email : '' }}">
                                                     </div>
                                                     <div class="col-lg-6">
-                                                        <input class="form-control" type="text" name="address"
+                                                        <input class="form-control" type="text" name="address" id="address"
                                                                placeholder="{{ $langg->lang155 }}" required=""
                                                                value="{{ Auth::guard('web')->check() ? Auth::guard('web')->user()->address : '' }}">
                                                     </div>
                                                     <div class="col-lg-6">
-                                                        <select class="form-control" name="customer_country"
+                                                        <select class="form-control" name="customer_country" id="customer_country"
                                                                 required="">
                                                             @include('includes.countries')
                                                         </select>
                                                     </div>
                                                     <div class="col-lg-6">
-                                                        <input class="form-control" type="text" name="city"
+                                                        <input class="form-control" type="text" name="city" id="city"
                                                                placeholder="{{ $langg->lang158 }}" required=""
                                                                value="{{ Auth::guard('web')->check() ? Auth::guard('web')->user()->city : '' }}">
                                                     </div>
                                                     <div class="col-lg-6">
-                                                        <input class="form-control" type="text" name="zip"
+                                                        <input class="form-control" type="text" name="zip" id="zip"
                                                                placeholder="{{ $langg->lang159 }}" required=""
                                                                value="{{ Auth::guard('web')->check() ? Auth::guard('web')->user()->zip : '' }}">
                                                     </div>
@@ -220,9 +219,9 @@
                                                                id="shipping_address"
                                                                placeholder="{{ $langg->lang155 }}">
                                                     </div>
-
+                                                    
                                                     <div class="col-lg-6">
-                                                        <select class="form-control ship_input" name="shipping_country">
+                                                        <select class="form-control ship_input" name="shipping_country" id="shipping_country">
                                                             @include('includes.countries')
                                                         </select>
                                                     </div>
@@ -638,9 +637,15 @@
                                                                             @endif
 
                                                                         </p>
+                                                                        
                                                                     </a>
-
-
+                                                                    
+                                                                    <button class="btn btn-primary btn-lg btn-block" id="sslczPayBtn"
+                                                                    token="if you have any token validation"
+                                                                    postdata="your javascript arrays or objects which requires in backend"
+                                                                    order="If you already have the transaction generated for current order"
+                                                                    endpoint="{{ url('/pay-via-ajax') }}"> Pay Now
+                                                            </button> 
 
                                                                 @endforeach
 
@@ -748,8 +753,8 @@
 
                         <input type="hidden" name="vendor_shipping_id" value="{{ $vendor_shipping_id }}">
                         <input type="hidden" name="vendor_packing_id" value="{{ $vendor_packing_id }}">
-
-
+                        
+                        
                         @if(Session::has('coupon_total'))
                             <input type="hidden" name="total" id="grandtotal" value="{{ $totalPrice }}">
                             <input type="hidden" id="tgrandtotal" value="{{ $totalPrice }}">
@@ -764,7 +769,7 @@
                             <input type="hidden" id="tgrandtotal" value="{{round($totalPrice * $curr->value,2)}}">
                         @endif
 
-
+                       
                         <input type="hidden" name="coupon_code" id="coupon_code"
                                value="{{ Session::has('coupon_code') ? Session::get('coupon_code') : '' }}">
                         <input type="hidden" name="coupon_discount" id="coupon_discount"
@@ -954,7 +959,7 @@
                                         @else
                                             <span id="final-cost">{{ App\Models\Product::convertPrice($totalPrice) }}</span>
                                         @endif
-
+                                        
 
                                     </div>
                                     {{-- Final Price Area End --}}
@@ -1144,7 +1149,27 @@
 @endsection
 
 @section('scripts')
+{{-- <script type="text/javascript">
+    var obj = {};
+    obj.cus_name = $('input[name="name"]').val() ? $('input[name="name"]').val() : $('input[name="shipping_name"]').val()*/;
+    obj.cus_phone = $('input[name="phone"]').val() ? $('input[name="phone"]').val() : $('input[name="shipping_phone"]').val();
+    obj.cus_email = $('input[name="email"]').val() ? $('input[name="email"]').val() : $('input[name="shipping_email"]').val();
+    obj.cus_addr1 = $('input[name="address"]').val() ? $('input[name="address"]').val() : $('input[name="shipping_address"]').val()*/;
+    obj.amount = $('#final-cost').text();
+console.log(obj);
+    $('#sslczPayBtn').prop('postdata', obj);
 
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            // script.src = "https://seamless-epay.sslcommerz.com/embed.min.js?" + Math.random().toString(36).substring(7); // USE THIS FOR LIVE
+            script.src = "https://sandbox.sslcommerz.com/embed.min.js?" + Math.random().toString(36).substring(7); // USE THIS FOR SANDBOX
+            tag.parentNode.insertBefore(script, tag);
+        };
+
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script> --}}
     <script src="https://js.paystack.co/v1/inline.js"></script>
 
 
@@ -1518,6 +1543,69 @@ $('#comment-log-reg1').modal('show');
     </script>
 
 
+
+
+<script defer>
+    var obj = {};
+    $(document).on('click change',function(){
+
+        obj.cus_name = $('#customer_name').val();
+    obj.cus_phone = $('#mobile').val();
+    obj.cus_email = $('#email').val();
+    obj.cus_addr1 = $('#address').val();
+    obj.amount = $('#total_amount').val();
+    
+    obj.personal_name = $('#personal-name').val();
+    obj.personal_email = $('#personal-email').val();
+    obj.personal_pass = $('#personal-pass').val();
+    obj.personal_confirm_pass = $('#personal-pass-confirm').val();
+    obj.personal_shipping = $('#shipop').val();
+    obj.personal_pickup_location = $('#pickup_location').val();
+    obj.name = $('#name').val();
+    obj.phone = $('#phone').val();
+    obj.email = $('#email').val();
+    obj.address = $('#address').val();
+    obj.customer_country = $('#customer_country').val();
+    obj.city = $('#city').val();
+    obj.zip = $('#zip').val();
+    obj.amount = $('#amount').val();
+    obj.shipping_name = $('#shippingFull_name').val();
+    obj.shipping_address = $('#shipping_address').val();
+    obj.shipping_country = $('#shipping_country').val();
+    obj.shipping_city = $('#shipping_city').val();
+    obj.shipping_zip = $('#shippingPostal_code').val();
+    obj.order_notes = $('#Order_Note').val();
+    obj.method = $('input[name="method"]').val();
+    obj.shipping_cost = $('#shipping-cost').val();
+    obj.packing_cost = $('#packing-cost').val();
+    obj.dp = $('#dp').val();
+    obj.tax = $('#tax').val();
+    obj.totalQty = $('#totalQty').val();
+    obj.vendor_shipping_id = $('#vendor_shipping_id').val();
+    obj.vendor_packing_id = $('#vendor_packing_id').val();
+    obj.grandtotal = $('#grandtotal').val();
+    obj.coupon_code = $('#coupon_code').val();
+    obj.coupon_discount = $('#coupon_discount').val();
+    obj.coupon_id = $('#coupon_id').val();
+    obj.user_id = $('#user_id').val();
+    obj.pass_check = $('input[name="pass_check"]').val() ? $('input[name="pass_check"]').val() : '';
+    $('#sslczPayBtn').prop('postdata', obj);
+    });
+    
+
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            // script.src = "https://seamless-epay.sslcommerz.com/embed.min.js?" + Math.random().toString(36).substring(7); // USE THIS FOR LIVE
+            script.src = "https://sandbox.sslcommerz.com/embed.min.js?" + Math.random().toString(36).substring(7); // USE THIS FOR SANDBOX
+            tag.parentNode.insertBefore(script, tag);
+        };
+
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+
+   
+</script>
 
 
 
