@@ -32,9 +32,9 @@ class SslCommerzNotification extends AbstractSslCommerz
         $validation = $this->validate($trx_id, $amount, $currency, $post_data);
 
         if ($validation) {
-            return true;
+            return $validation;
         } else {
-            return false;
+            return $validation;
         }
     }
 

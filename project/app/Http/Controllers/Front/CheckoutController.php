@@ -632,7 +632,6 @@ class CheckoutController extends Controller
     
     public function gateway(Request $request)
     {
-
         $input = (array) json_decode($request->cart_json);
         info($input);
         $input['tran_id'] = uniqid();
@@ -709,11 +708,10 @@ class CheckoutController extends Controller
         }
         $settings = Generalsetting::findOrFail(1);
         $order = new Order;
-        $success_url = action('Front\PaymentController@payreturn');
         $item_name = $settings->title . " Order";
         $item_number = str_random(4) . time();
         $order['user_id'] = $input['user_id'];
-        // $order['cart'] = utf8_encode(bzcompress(serialize($cart), 9));
+        $order['cart'] = utf8_encode(bzcompress(serialize($cart), 9));
         $order['totalQty'] = $input['totalQty'];
         $order['pay_amount'] = round($input['total'] / $curr->value, 2);
         $order['method'] = $input['method'];
@@ -836,14 +834,14 @@ class CheckoutController extends Controller
             }
         }
 
-        Session::put('temporder', $order);
-        Session::put('tempcart', $cart);
-        Session::forget('cart');
-        Session::forget('already');
-        Session::forget('coupon');
-        Session::forget('coupon_total');
-        Session::forget('coupon_total1');
-        Session::forget('coupon_percentage');
+        // Session::put('temporder', $order);
+        // Session::put('tempcart', $cart);
+        // Session::forget('cart');
+        // Session::forget('already');
+        // Session::forget('coupon');
+        // Session::forget('coupon_total');
+        // Session::forget('coupon_total1');
+        // Session::forget('coupon_percentage');
 
 
         //Sending Email To Buyer
@@ -885,15 +883,49 @@ class CheckoutController extends Controller
             $headers = "From: " . $gs->from_name . "<" . $gs->from_email . ">";
             mail($to, $subject, $msg, $headers);
         }
+
+         $post_data['total_amount'] = round($input['total'] / $curr->value, 2); # You cant not pay less than 10
+         $post_data['currency'] = $curr['name'];
+        $post_data['tran_id'] = $input['tran_id']; // tran_id must be unique
+
+        # CUSTOMER INFORMATION
+        $post_data['cus_name'] = $input['name'] ?? '';
+        $post_data['cus_email'] = $input['email'] ?? '';
+        $post_data['cus_add1'] = $input['address'] ?? '';
+        $post_data['cus_add2'] = $input['address'] ?? '';
+        $post_data['cus_city'] = $input['city'] ?? '';
+        $post_data['cus_state'] = $input['city'] ?? '';
+        $post_data['cus_postcode'] = $input['zip'] ?? '';
+        $post_data['cus_country'] = $input['customer_country'] ?? 'Bangladesh';
+        $post_data['cus_phone'] = $input['phone'] ?? '';
+        $post_data['cus_fax'] = $input['phone'] ?? '';
+
+        # SHIPMENT INFORMATION
+        $post_data['ship_name'] = ($input['shipping_name'] == '') ? $input['name'] : $input['shipping_name'];
+        $post_data['ship_add1'] = ($input['shipping_address'] == '') ? $input['address'] : $input['shipping_address'];
+        $post_data['ship_add2'] = ($input['shipping_address'] == '') ? $input['address'] : $input['shipping_address'];
+        $post_data['ship_city'] = ($input['shipping_city'] == '') ? $input['city'] : $input['shipping_city'];
+        $post_data['ship_state'] = ($input['shipping_city'] == '') ? $input['city'] : $input['shipping_city'];
+        $post_data['ship_postcode'] = ($input['shipping_zip'] == '') ? $input['zip'] : $input['shipping_zip'];
+        $post_data['ship_phone'] = ($input['shipping_phone'] == '') ? $input['phone'] : $input['shipping_phone'];
+        $post_data['ship_country'] = ($input['shipping_country'] == '') ? $input['customer_country'] : $input['shipping_country'];
+
+        $post_data['shipping_method'] = $input['method'];
+        $post_data['product_name'] = "NO";
+        $post_data['product_category'] = "Goods";
+        $post_data['product_profile'] = "physical-goods";
+
+     
+
+info($post_data);
         $sslc = new SslCommerzNotification();
         # initiate(Transaction Data , false: Redirect to SSLCOMMERZ gateway/ true: Show all the Payement gateway here )
-        $payment_options = $sslc->makePayment($input, 'checkout', 'json');
+        $payment_options = $sslc->makePayment($post_data, 'checkout', 'json');
 
         if (!is_array($payment_options)) {
             print_r($payment_options);
             $payment_options = array();
         }
-        return redirect($success_url);
     }
 
     public function success(Request $request)
@@ -903,9 +935,9 @@ class CheckoutController extends Controller
         } else {
             $curr = Currency::where('is_default', '=', 1)->first();
         }
-        echo "Transaction is Successful";
-dd('asd');
+        info($request->all());
         $tran_id = $request->input('tran_id');
+        echo "Transaction is Successful.$tran_id";
         $amount = $request->input('amount');
         $currency = $curr;
         $sslc = new SslCommerzNotification();
@@ -916,7 +948,6 @@ dd('asd');
             ->select('txnid', 'status', 'pay_amount')->first();
         if ($order_detials->status == 'pending') {
             $validation = $sslc->orderValidate($request->all(), $tran_id, $amount, $currency);
-
             if ($validation == TRUE) {
                 /*
                 That means IPN did not work or IPN URL was not set in your merchant panel. Here you need to update order status

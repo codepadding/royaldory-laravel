@@ -126,7 +126,7 @@
 
     <input type="hidden" name="method" value="{{ $gateway->title }}">
 
-    {{-- <div class="row">
+  {{--   <div class="row">
         
             <div class="col-lg-12 pb-2">
 
