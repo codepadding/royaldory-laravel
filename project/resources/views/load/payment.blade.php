@@ -107,23 +107,64 @@
 
 
 @if($payment == 'other')
+<style>
+    .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+        }
+    }
+</style>
 
     <input type="hidden" name="method" value="{{ $gateway->title }}">
 
-    <div class="row">
+  {{--   <div class="row">
+        
+            <div class="col-lg-12 pb-2">
 
-        <div class="col-lg-12 pb-2">
-
-            {!! $gateway->details !!}
-
-        </div>
-
-
-        <div class="col-lg-6">
-            <label>{{ $langg->lang167 }} *</label>
-            <input class="form-control" name="txn_id4" type="text" placeholder="{{ $langg->lang167 }}"/>
-        </div>
-
-
-    </div>
+                {!! $gateway->details !!}
+    
+            </div>
+    
+    
+            <div class="col-lg-6">
+                <label>{{ $langg->lang167 }} *</label>
+                <input class="form-control" name="tran_id" type="text" placeholder="{{ $langg->lang167 }}"/>
+            </div>
+    
+    </div> --}}
+    <button class="btn btn-primary btn-lg btn-block" id="sslczPayBtn"
+    token="if you have any token validation"
+    postdata="your javascript arrays or objects which requires in backend"
+    order="If you already have the transaction generated for current order"
+    endpoint="{{ url('/pay-via-ajax') }}"> Pay Now
+</button>
+    {{-- <script defer>
+        var obj = {};
+        obj.cus_name = $('#customer_name').val();
+        obj.cus_phone = $('#mobile').val();
+        obj.cus_email = $('#email').val();
+        obj.cus_addr1 = $('#address').val();
+        obj.amount = $('#total_amount').val();
+        $('#sslczPayBtn').prop('postdata', obj);
+    
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            // script.src = "https://seamless-epay.sslcommerz.com/embed.min.js?" + Math.random().toString(36).substring(7); // USE THIS FOR LIVE
+            script.src = "https://sandbox.sslcommerz.com/embed.min.js?" + Math.random().toString(36).substring(7); // USE THIS FOR SANDBOX
+            tag.parentNode.insertBefore(script, tag);
+        };
+    
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+    </script> --}}
 @endif

@@ -1355,7 +1355,17 @@ Route::group(['middleware' => 'maintenance'], function () {
     Route::post('/paypal-submit', 'Front\PaymentController@store')->name('paypal.submit');
     Route::post('/stripe-submit', 'Front\StripeController@store')->name('stripe.submit');
 
-
+    Route::get('/example1', 'SslCommerzPaymentController@exampleEasyCheckout');
+    Route::get('/example2', 'SslCommerzPaymentController@exampleHostedCheckout');
+    
+    Route::post('/pay', 'Front\CheckoutController@gateway');
+    Route::post('/pay-via-ajax', 'Front\CheckoutController@gateway');
+    
+    Route::post('/success','Front\CheckoutController@success');
+    Route::post('/fail','SslCommerzPaymentController@fail');
+    Route::post('/cancel','SslCommerzPaymentController@cancel');
+    
+    Route::post('/ipn','SslCommerzPaymentController@ipn');
     // Molly Routes
 
     Route::post('/molly/submit', 'Front\MollyController@store')->name('molly.submit');

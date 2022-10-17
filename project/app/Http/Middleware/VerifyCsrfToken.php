@@ -19,6 +19,6 @@ class VerifyCsrfToken extends Middleware
         '/user/paytm/notify',
         '/razorpay-callback',
         '/user/razorpay/notify',
-
+        '/pay-via-ajax', '/success','/cancel','/fail','/ipn'
     ];
 }
