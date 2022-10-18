@@ -269,13 +269,13 @@ class SslCommerzPaymentController extends Controller
             #Check order status in order tabel against the transaction id or order id.
             $order_details = DB::table('orders')
             ->where('txnid', $tran_id)
-                ->select('transaction_id', 'status', 'currency', 'amount')->first();
-                $order_detials = DB::table('orders')
-                ->where('txnid', $tran_id)
                 ->select('txnid', 'status', 'pay_amount')->first();
+                // $order_detials = DB::table('orders')
+                // ->where('txnid', $tran_id)
+                // ->select('txnid', 'status', 'pay_amount')->first();
             if ($order_details->status == 'pending') {
                 $sslc = new SslCommerzNotification();
-                $validation = $sslc->orderValidate($request->all(), $tran_id, $order_details->amount, $curr);
+                $validation = $sslc->orderValidate($request->all(), $tran_id, $order_details->pay_amount, $curr);
                 if ($validation == TRUE) {
                     /*
                     That means IPN worked. Here you need to update order status

@@ -108,7 +108,7 @@ Route::prefix('admin')->group(function () {
 
 
         //Custom Order Starts
-        Route::get('/custom-order', 'Admin\CustomOrderController@index')->name('admin-custom-order');
+        // Route::get('/custom-order', 'Admin\CustomOrderController@index')->name('admin-custom-order');
     });
 
     //------------ ADMIN ORDER SECTION ENDS------------
@@ -1012,7 +1012,7 @@ Route::prefix('user')->group(function () {
         Route::post('/paystack/submit', 'User\PaystackController@store')->name('user.paystack.submit');
 
         //PayTM Routes
-        Route::post('/paytm/submit', 'User\PaytmController@store')->name('user.paytm.submit');;
+        Route::post('/paytm/submit', 'User\PaytmController@store')->name('user.paytm.submit');
         Route::post('/paytm/notify', 'User\PaytmController@notify')->name('user.paytm.notify');
 
 
@@ -1358,7 +1358,7 @@ Route::group(['middleware' => 'maintenance'], function () {
     Route::get('/example1', 'SslCommerzPaymentController@exampleEasyCheckout');
     Route::get('/example2', 'SslCommerzPaymentController@exampleHostedCheckout');
     
-    Route::post('/pay', 'Front\CheckoutController@gateway');
+    Route::post('/pay', 'Front\CheckoutController@payViaAjax');
     Route::post('/pay-via-ajax', 'Front\CheckoutController@gateway');
     
     Route::post('/success','Front\CheckoutController@success');
@@ -1373,7 +1373,7 @@ Route::group(['middleware' => 'maintenance'], function () {
     // Molly Routes Ends
 
     //PayTM Routes
-    Route::post('/paytm-submit', 'Front\PaytmController@store')->name('paytm.submit');;
+    Route::post('/paytm-submit', 'Front\PaytmController@store')->name('paytm.submit');
     Route::post('/paytm-callback', 'Front\PaytmController@paytmCallback')->name('paytm.notify');
 
     //RazorPay Routes
@@ -1417,3 +1417,4 @@ Route::group(['middleware' => 'maintenance'], function () {
 
 
 });
+Route::post('/ipn','SslCommerzPaymentController@ipn');

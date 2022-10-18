@@ -682,8 +682,8 @@ class CheckoutController extends Controller
         if (Session::has('currency')) {
             $curr = Currency::find(Session::get('currency'));
         } else {
-            $curr = Currency::where('is_default', '=', 1)->first();
-        }
+           $curr = Currency::where('is_default', '=', 1)->first();
+    }
         foreach ($cart->items as $key => $prod) {
             if (!empty($prod['item']['license']) && !empty($prod['item']['license_qty'])) {
                 foreach ($prod['item']['license_qty'] as $ttl => $dtl) {
@@ -918,6 +918,43 @@ class CheckoutController extends Controller
      
 
 info($post_data);
+// $post_data['total_amount'] = '10'; # You cant not pay less than 10
+// $post_data['currency'] = "BDT";
+// $post_data['tran_id'] = $input['tran_id']; // tran_id must be unique
+
+// # CUSTOMER INFORMATION
+// $post_data['cus_name'] = 'Customer Name';
+// $post_data['cus_email'] = 'customer@mail.com';
+// $post_data['cus_add1'] = 'Customer Address';
+// $post_data['cus_add2'] = "";
+// $post_data['cus_city'] = "";
+// $post_data['cus_state'] = "";
+// $post_data['cus_postcode'] = "";
+// $post_data['cus_country'] = "Bangladesh";
+// $post_data['cus_phone'] = '880137604100';
+// $post_data['cus_fax'] = "";
+
+// # SHIPMENT INFORMATION
+// $post_data['ship_name'] = "Store Test";
+// $post_data['ship_add1'] = "Dhaka";
+// $post_data['ship_add2'] = "Dhaka";
+// $post_data['ship_city'] = "Dhaka";
+// $post_data['ship_state'] = "Dhaka";
+// $post_data['ship_postcode'] = "1000";
+// $post_data['ship_phone'] = "";
+// $post_data['ship_country'] = "Bangladesh";
+
+// $post_data['shipping_method'] = "NO";
+// $post_data['product_name'] = "Computer";
+// $post_data['product_category'] = "Goods";
+// $post_data['product_profile'] = "physical-goods";
+
+// # OPTIONAL PARAMETERS
+// $post_data['value_a'] = "ref001";
+// $post_data['value_b'] = "ref002";
+// $post_data['value_c'] = "ref003";
+// $post_data['value_d'] = "ref004";
+
         $sslc = new SslCommerzNotification();
         # initiate(Transaction Data , false: Redirect to SSLCOMMERZ gateway/ true: Show all the Payement gateway here )
         $payment_options = $sslc->makePayment($post_data, 'checkout', 'json');
@@ -935,6 +972,7 @@ info($post_data);
         } else {
             $curr = Currency::where('is_default', '=', 1)->first();
         }
+
         info($request->all());
         $tran_id = $request->input('tran_id');
         echo "Transaction is Successful.$tran_id";
@@ -946,8 +984,14 @@ info($post_data);
         $order_detials = DB::table('orders')
             ->where('txnid', $tran_id)
             ->select('txnid', 'status', 'pay_amount')->first();
+            info('jkhj');
+            info($request->all());
+            info($tran_id);
+            info($amount);
+            info($currency);
         if ($order_detials->status == 'pending') {
-            $validation = $sslc->orderValidate($request->all(), $tran_id, $amount, $currency);
+            $validation = $sslc->orderValidate($request->all(), $tran_id, $amount, $curr['name']);
+            info($validation);
             if ($validation == TRUE) {
                 /*
                 That means IPN did not work or IPN URL was not set in your merchant panel. Here you need to update order status
