@@ -602,33 +602,7 @@ class CheckoutController extends Controller
     {
         return view('exampleEasycheckout');
     }
-    public function payModal(Request $request){
-        if (Session::has('currency')) {
-            $curr = Currency::find(Session::get('currency'));
-        } else {
-            $curr = Currency::where('is_default', '=', 1)->first();
-        }
-        $update_product = DB::table('orderstry')
-        ->where('transaction_id', $post_data['tran_id'])
-        ->updateOrInsert([
-            'name' => $request['name'],
-            'email' => $request['email'],
-            'phone' => $request['phone'],
-            'amount' => $request['grandtotal'],
-            'status' => 'pending',
-            'address' => $request['address'],
-            'transaction_id' => $request['tran_id'],
-            'currency' => $curr
-        ]);
-    $sslc = new SslCommerzNotification();
-    # initiate(Transaction Data , false: Redirect to SSLCOMMERZ gateway/ true: Show all the Payement gateway here )
-    $payment_options = $sslc->makePayment($request->all(), 'hosted');
-
-    if (!is_array($payment_options)) {
-        print_r($payment_options);
-        $payment_options = array();
-    }
-    }
+    
     
     public function gateway(Request $request)
     {
@@ -710,7 +684,7 @@ class CheckoutController extends Controller
         $order = new Order;
         $item_name = $settings->title . " Order";
         $item_number = str_random(4) . time();
-        $order['user_id'] = $input['user_id'];
+        $order['user_id'] = ($input['user_id'] == '') ? null : $input['user_id'];
         $order['cart'] = utf8_encode(bzcompress(serialize($cart), 9));
         $order['totalQty'] = $input['totalQty'];
         $order['pay_amount'] = round($input['total'] / $curr->value, 2);
@@ -728,17 +702,17 @@ class CheckoutController extends Controller
         $order['customer_country'] = $input['customer_country'];
         $order['customer_city'] = $input['city'];
         $order['customer_zip'] = $input['zip'];
-        $order['shipping_email'] = $input['shipping_email'];
-        $order['shipping_name'] = $input['shipping_name'];
-        $order['shipping_phone'] = $input['shipping_phone'];
-        $order['shipping_address'] = $input['shipping_address'];
-        $order['shipping_country'] = $input['shipping_country'];
-        $order['shipping_city'] = $input['shipping_city'];
-        $order['shipping_zip'] = $input['shipping_zip'];
+        $order['shipping_email'] = ($input['shipping_email'] == '') ? null : $input['shipping_email'];
+        $order['shipping_name'] = ($input['shipping_name'] == '') ? null : $input['shipping_name'];
+        $order['shipping_phone'] = ($input['shipping_phone'] == '') ? null : $input['shipping_phone'];
+        $order['shipping_address'] = ($input['shipping_address'] == '') ? null : $input['shipping_phone'];
+        $order['shipping_country'] = ($input['shipping_country'] == '') ? null : $input['shipping_country'];
+        $order['shipping_city'] = ($input['shipping_city'] == '') ? null : $input['shipping_city'];
+        $order['shipping_zip'] = ($input['shipping_zip'] == '') ? null : $input['shipping_zip'];
         $order['order_note'] = $input['order_notes'];
         $order['txnid'] = $input['tran_id'];
-        $order['coupon_code'] = $input['coupon_code'];
-        $order['coupon_discount'] = $input['coupon_discount'];
+        $order['coupon_code'] = ($input['coupon_code'] == '') ? null : $input['coupon_code'];
+        $order['coupon_discount'] = ($input['coupon_discount'] == '') ? null : $input['coupon_code'];
         $order['dp'] = $input['dp'];
         $order['payment_status'] = "pending";
         $order['currency_sign'] = $curr['sign'];

@@ -644,7 +644,7 @@
                                                                     token="if you have any token validation"
                                                                     postdata="your javascript arrays or objects which requires in backend"
                                                                     order="If you already have the transaction generated for current order"
-                                                                    endpoint="{{ url('/pay-via-ajax') }}"> Pay Now
+                                                                    endpoint="{{ url('/pay-via-ajax') }}" style="display:none!important;"> Pay Now
                                                             </button> 
 
                                                                 @endforeach
