@@ -7,6 +7,22 @@
         .root.root--in-iframe {
             background: #4682b447 !important;
         }
+        <style>
+    .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+        }
+    }
+</style>
     </style>
 
 @endsection
@@ -613,7 +629,7 @@
 
                                                                 @foreach($gateways as $gt)
 
-                                                                    <a class="nav-link payment" data-val=""
+                                                                <a class="nav-link payment" data-val="online_payment"
                                                                        data-show="yes"
                                                                        data-form="{{route('gateway.submit')}}"
                                                                        data-href="{{ route('front.load.payment',['slug1' => 'other','slug2' => $gt->id]) }}"
@@ -637,15 +653,15 @@
                                                                             @endif
 
                                                                         </p>
-                                                                        
+                                                                        <button class="btn btn-primary btn-lg btn-block d-none" id="sslczPayBtn"
+                                                                        token="if you have any token validation"
+                                                                        postdata="your javascript arrays or objects which requires in backend"
+                                                                        order="If you already have the transaction generated for current order"
+                                                                        endpoint="{{ url('/pay-via-ajax') }}"> Pay Now
+                                                                        </button> 
                                                                     </a>
                                                                     
-                                                                    <button class="btn btn-primary btn-lg btn-block" id="sslczPayBtn"
-                                                                    token="if you have any token validation"
-                                                                    postdata="your javascript arrays or objects which requires in backend"
-                                                                    order="If you already have the transaction generated for current order"
-                                                                    endpoint="{{ url('/pay-via-ajax') }}" style="display:none!important;"> Pay Now
-                                                            </button> 
+                                                                   
 
                                                                 @endforeach
 
@@ -715,7 +731,7 @@
                                                                              id="v-pills-tab{{ $gt->id }}"
                                                                              role="tabpanel"
                                                                              aria-labelledby="v-pills-tab{{ $gt->id }}-tab">
-
+                                                                             
                                                                         </div>
 
                                                                     @endforeach
@@ -1493,18 +1509,27 @@ $('#comment-log-reg1').modal('show');
                 $('.checkoutform').prop('id', '');
             }
             $('.checkoutform').prop('action', $(this).data('form'));
-            $('.pay-area #v-pills-tabContent .tab-pane.fade').not($(this).attr('href')).html('');
-            var show = $(this).data('show');
-            if (show != 'no') {
-                $('.pay-area').removeClass('d-none');
-            }
-            else {
-                $('.pay-area').addClass('d-none');
-            }
-            $($(this).attr('href')).load($(this).data('href'), function () {
-                $('.submit-loader').hide();
-            });
+            if ($(this).data('val') == 'online_payment') {
+                $('#final-btn').addClass('d-none');
+                
 
+            }else{
+                $('#final-btn').removeClass('d-none');
+                
+
+            }
+            $('.pay-area #v-pills-tabContent .tab-pane.fade').not($(this).attr('href')).html('');
+                var show = $(this).data('show');
+                if (show != 'no') {
+                    $('.pay-area').removeClass('d-none');
+                }
+                else {
+                    $('.pay-area').addClass('d-none');
+                }
+                $($(this).attr('href')).load($(this).data('href'), function () {
+                    $('.submit-loader').hide();
+                });
+          
 
         })
 
