@@ -1362,10 +1362,10 @@ Route::group(['middleware' => 'maintenance'], function () {
     Route::post('/pay-via-ajax', 'Front\CheckoutController@gateway');
     
     Route::post('/success','Front\CheckoutController@success');
-    Route::post('/fail','SslCommerzPaymentController@fail');
-    Route::post('/cancel','SslCommerzPaymentController@cancel');
+    Route::post('/fail','Front\CheckoutController@fail');
+    Route::post('/cancel','Front\CheckoutController@cancel');
     
-    Route::post('/ipn','SslCommerzPaymentController@ipn');
+    Route::post('/ipn','Front\CheckoutController@ipn');
     // Molly Routes
 
     Route::post('/molly/submit', 'Front\MollyController@store')->name('molly.submit');
